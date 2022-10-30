@@ -1,12 +1,15 @@
+import 'package:auth/controllers/userController.dart';
+import 'package:auth/models/user.dart';
+import 'package:auth/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 
 class AuthController extends GetxController {
   FirebaseAuth _auth = FirebaseAuth.instance;
-  late Rx<User?> _firebaseUser;
-  bool verified = false;
-  String? get user => _firebaseUser.value?.email;
+  late Rx<User> _firebaseUser;
+  Rx<bool> verified = false.obs;
+  String? get user => _firebaseUser.value.uid;
   void onInit() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
@@ -15,12 +18,19 @@ class AuthController extends GetxController {
     });
   }
 
-  void createUser(String email, String password) async {
+  void createUser(String name, String email, String password) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      verified = true;
+      UserCredential _authResult = await _auth.createUserWithEmailAndPassword(
+          email: email.trim(), password: password.trim());
+      verified.value = true;
+      UserModel _user = UserModel(_authResult.user!.uid, name, email);
+      var hi = await Database().createNewUser(_user);
+      if (hi!) {
+        Get.find<UserController>().user = _user;
+        Get.back();
+      }
     } catch (e) {
+      print(e.toString());
       Get.snackbar(
         "Error creating user",
         e.toString(),
@@ -31,9 +41,13 @@ class AuthController extends GetxController {
 
   void login(String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      verified = true;
+      UserCredential _authResult = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      verified.value = true;
+      Get.find<UserController>().user =
+          await Database().getUser(_authResult.user!.uid) as UserModel;
     } catch (e) {
+      print(e.toString());
       Get.snackbar("Error login user", e.toString(),
           snackPosition: SnackPosition.BOTTOM);
     }
@@ -42,7 +56,9 @@ class AuthController extends GetxController {
   void signOut() async {
     try {
       await _auth.signOut();
+      Get.find<UserController>().clear();
     } catch (e) {
+      print(e.toString());
       Get.snackbar("Error logout user", e.toString(),
           snackPosition: SnackPosition.BOTTOM);
     }

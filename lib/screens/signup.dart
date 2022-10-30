@@ -45,10 +45,10 @@ class SignUp extends GetWidget<AuthController> {
               TextButton(
                 child: Text("Sign Up"),
                 onPressed: () {
-                  controller.createUser(
+                  controller.createUser(nameController.text,
                       emailController.text, passwordController.text);
-                  if (controller.verified) {
-                    Get.to(home());
+                  if (controller.verified.value) {
+                    Get.to(() => home());
                   }
                 },
               )

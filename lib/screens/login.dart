@@ -35,14 +35,14 @@ class login extends GetWidget<AuthController> {
                       onPressed: () {
                         controller.login(
                             emailController.text, passwordController.text);
-                        if (controller.verified) {
-                          Get.to(home());
+                        if (controller.verified.value) {
+                          Get.to(() => home());
                         }
                       }),
                   TextButton(
                       child: Text("signup"),
                       onPressed: () {
-                        Get.to(SignUp());
+                        Get.to(() => SignUp());
                       }),
                 ])),
       ),
