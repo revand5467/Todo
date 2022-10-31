@@ -16,7 +16,7 @@ class Root extends GetWidget<AuthController> {
         if (Get.find<AuthController>().user != null) {
           return home();
         } else {
-          return login();
+          return Login();
         }
       },
     );

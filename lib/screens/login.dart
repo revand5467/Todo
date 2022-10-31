@@ -4,7 +4,7 @@ import 'package:auth/screens/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class login extends GetWidget<AuthController> {
+class Login extends GetWidget<AuthController> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   @override

@@ -1,15 +1,35 @@
 import 'package:auth/controllers/userController.dart';
 import 'package:auth/models/user.dart';
+import 'package:auth/screens/home.dart';
 import 'package:auth/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
+import '../screens/login.dart';
 
 class AuthController extends GetxController {
+  static AuthController instance = Get.find();
   FirebaseAuth _auth = FirebaseAuth.instance;
-  late Rx<User> _firebaseUser;
+  late Rx<User?> _firebaseUser;
   Rx<bool> verified = false.obs;
-  String? get user => _firebaseUser.value.uid;
+  String get user => _firebaseUser.value!.uid;
+
+  void onReady() {
+    super.onReady();
+    _firebaseUser = Rx<User?>(_auth.currentUser);
+    _firebaseUser.bindStream(_auth.userChanges());
+    ever(_firebaseUser, _initialScreen);
+  }
+
+  _initialScreen(User? user) {
+    if (user == null) {
+      print("login page");
+      Get.offAll(() => Login());
+    } else {
+      Get.offAll(() => home());
+    }
+  }
+
   void onInit() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
