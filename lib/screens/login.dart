@@ -4,7 +4,7 @@ import 'package:auth/screens/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class login extends GetWidget<AuthController> {
+class Login extends GetWidget<AuthController> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   @override
@@ -35,14 +35,14 @@ class login extends GetWidget<AuthController> {
                       onPressed: () {
                         controller.login(
                             emailController.text, passwordController.text);
-                        if (controller.verified) {
-                          Get.to(home());
+                        if (controller.verified.value) {
+                          Get.to(() => home());
                         }
                       }),
                   TextButton(
                       child: Text("signup"),
                       onPressed: () {
-                        Get.to(SignUp());
+                        Get.to(() => SignUp());
                       }),
                 ])),
       ),
